@@ -10,6 +10,11 @@ Rails.application.routes.draw do
   }
 
   resources :users
+  resources :messages do
+    collection do
+      get 'fetch', to: 'messages#fetch_messages'
+    end
+  end
   post "/user/send_message", to: "users#send_message"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
