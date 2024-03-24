@@ -17,4 +17,16 @@ class UsersController < ApplicationController
       render json: @message.errors, status: :unprocessable_entity
     end
   end
+
+  def update_avatar
+    @user = User.find(params[:user_id])
+    @user.avatar = params[:avatar]
+  
+    if @user.save
+      render json: { message: 'Avatar updated successfully', user: @user }, status: :ok
+    else
+      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+  
 end
