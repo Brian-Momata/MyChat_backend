@@ -53,5 +53,3 @@ gem "devise", "~> 4.9"
 gem "devise-jwt", "~> 0.11.0"
 
 gem "jsonapi-serializer", "~> 2.2"
-
-gem 'uglifier', '~> 4.2'
