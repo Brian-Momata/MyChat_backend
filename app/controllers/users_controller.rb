@@ -11,6 +11,8 @@ class UsersController < ApplicationController
 
     if @message.save
       # Message created successfully
+      ActionCable.server.broadcast("chat_#{params[:receiver_id]}", "")
+      ActionCable.server.broadcast("chat_#{params[:receiver_id]}#{params[:sender_id]}", @message)
       render json: @message, status: :created
     else
       # Handle validation errors or other failures
