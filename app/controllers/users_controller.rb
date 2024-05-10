@@ -33,17 +33,17 @@ class UsersController < ApplicationController
   
   def sent_messages
     @current_user = User.find(params[:user_id])
-
-    # Retrieve the latest message for each receiver_id
-    latest_messages = Message.select('MAX(created_at) AS latest_created_at, receiver_id')
-                             .where(sender_id: @current_user.id)
-                             .group(:receiver_id)
-
+  
+    # Subquery to get the latest messages for each sender-receiver pair
+    latest_messages_subquery = Message.select('GREATEST(MAX(created_at), MAX(updated_at)) AS latest_time')
+                                      .where('(sender_id = ? OR receiver_id = ?)', @current_user.id, @current_user.id)
+                                      .group('CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END', @current_user.id)
+  
     # Join with the messages table to get the full message objects
-    @sent_messages = Message.joins("INNER JOIN (#{latest_messages.to_sql}) AS latest ON messages.receiver_id = latest.receiver_id AND messages.created_at = latest.latest_created_at")
-                            .where(sender_id: @current_user.id)
-                            .order('messages.created_at DESC')
-
-    render json: @sent_messages
+    @latest_messages = Message.joins("INNER JOIN (#{latest_messages_subquery.to_sql}) AS latest ON GREATEST(messages.created_at, messages.updated_at) = latest.latest_time")
+                              .where('(sender_id = ? OR receiver_id = ?)', @current_user.id, @current_user.id)
+                              .order('latest.latest_time DESC')
+  
+    render json: @latest_messages
   end
 end
