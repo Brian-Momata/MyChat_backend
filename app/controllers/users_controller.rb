@@ -34,16 +34,20 @@ class UsersController < ApplicationController
   def sent_messages
     @current_user = User.find(params[:user_id])
   
-    # Subquery to get the latest messages for each sender-receiver pair
-    latest_messages_subquery = Message.select('GREATEST(MAX(created_at), MAX(updated_at)) AS latest_time')
-                                      .where('(sender_id = ? OR receiver_id = ?)', @current_user.id, @current_user.id)
-                                      .group('CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END', @current_user.id)
+    # Query for the latest messages where the current user is the sender
+    sent_messages_query = Message.where(sender_id: @current_user.id)
+                                 .select('MAX(created_at) AS latest_time, receiver_id AS user_id, content')
+                                 .group(:receiver_id)
   
-    # Join with the messages table to get the full message objects
-    @latest_messages = Message.joins("INNER JOIN (#{latest_messages_subquery.to_sql}) AS latest ON GREATEST(messages.created_at, messages.updated_at) = latest.latest_time")
-                              .where('(sender_id = ? OR receiver_id = ?)', @current_user.id, @current_user.id)
-                              .order('latest.latest_time DESC')
+    # Query for the latest messages where the current user is the receiver
+    received_messages_query = Message.where(receiver_id: @current_user.id)
+                                     .select('MAX(created_at) AS latest_time, sender_id AS user_id, content')
+                                     .group(:sender_id)
+  
+    # Union of sent and received messages
+    @latest_messages = Message.from(sent_messages_query.union(received_messages_query).to_sql)
+                              .order('latest_time DESC')
   
     render json: @latest_messages
-  end
+  end  
 end
