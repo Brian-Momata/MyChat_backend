@@ -6,5 +6,5 @@ test:
 
 production:
   adapter: redis
-  url: redis://red-couptevsc6pc73aorekg:6379
+  url: 'backend-api-dmnv.onrender.com'
   channel_prefix: backend_api_production
