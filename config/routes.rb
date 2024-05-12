@@ -20,6 +20,7 @@ Rails.application.routes.draw do
   post "/user/send_message", to: "users#send_message"
   post "/user/avatar", to: "users#update_avatar"
   get "/user/sent_messages", to: "users#sent_messages"
+  get "/user/latest_between_users", to: "users#latest_between_users"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

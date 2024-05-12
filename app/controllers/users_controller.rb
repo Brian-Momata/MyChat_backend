@@ -46,4 +46,15 @@ class UsersController < ApplicationController
 
     render json: @sent_messages
   end
+
+  def latest_between_users
+    sender_id = params[:sender_id]
+    receiver_id = params[:receiver_id]
+    
+    latest_message = Message.between_users(sender_id, receiver_id)
+                           .order('created_at DESC')
+                           .first
+    
+    render json: latest_message
+  end  
 end
