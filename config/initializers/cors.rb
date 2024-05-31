@@ -10,6 +10,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
     origins "https://momatachat.netlify.app"
     resource "*",
       headers: :any,
+      expose: ["Authorization"], # exposes Authorization header and allows response.headers.get('Authorization')
       methods: [:get, :post, :put, :patch, :delete, :options, :head],
       credentials: true,
       max_age: 86400
