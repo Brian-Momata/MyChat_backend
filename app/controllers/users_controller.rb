@@ -56,5 +56,13 @@ class UsersController < ApplicationController
                            .first
     
     render json: latest_message
-  end  
+  end
+
+  def validate_token
+    if current_user
+      render json: { user: current_user }, status: :ok
+    else
+      render json: { error: 'Invalid token' }, status: :unauthorized
+    end
+  end
 end
